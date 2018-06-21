@@ -40,4 +40,4 @@ class Undirected_graph:
         if first_node in self.graph:
             if second_node in self.graph[first_node]:
                 return self.graph[first_node][second_node]
-        return -1
+        return 0

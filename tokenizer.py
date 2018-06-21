@@ -95,6 +95,97 @@ class FolderTokenizer:
                     continue
                 if self.stemmer:
                     token = self.stemmer.stem(token)
+                if not token:
+                    continue
+                if token not in self.vocabulary:
+                    self.vocabulary[token] = 1
+                    self.ngrams[filename].add_node(token)
+                else:
+                    self.vocabulary[token] += 1
+                if lastTokens:
+                    for lastToken in lastTokens:
+                        currentEdge = self.ngrams[filename].get_edge(lastToken, token)
+                        if currentEdge == -1:
+                            self.ngrams[filename].add_edge(lastToken, token, 1)
+                        else:
+                            self.ngrams[filename].add_edge(lastToken, token, currentEdge+1)
+                lastTokens.append(token)
+                if len(lastTokens) > self.n:
+                    lastTokens = lastTokens[1:]
+
+    def checkStopWord(self,word):
+        """
+        If there is a stop word catalogue, it checks if a given word is a stop word in the catalogue.
+        If not, it checks if a give word is a stop word in the NLTK catalogue.
+        It receives the word as parameters and outputs True or False.
+        """
+        if not self.stopWords:
+            return False
+        else:
+            if word in self.stopWords:
+                return True
+            else:
+                return False
+
+    def sparseVectors(self):
+        """
+        Returns the vector in the sparse TF-IDF notation.
+        Returns a dictionary of dictionaries.
+        """
+        words = list(self.vocabulary.keys())
+        sparseVectors = {}
+        currentWord = 0
+        for word in words:
+            currentWord += 1
+            files = self.vocabulary[word]
+            for file in files:
+                if file not in sparseVectors:
+                    sparseVectors[file] = {currentWord:self.vocabulary[word][file]}
+                else:
+                    sparseVectors[file][currentWord] = self.vocabulary[word][file]
+        return sparseVectors
+
+    def listOfWords(self):
+        """
+        Returns a list of the words in the vocabulary.
+        The index for each word matches the index used in the sparse vector.
+        """
+        return list(self.vocabulary.keys())
+
+class nGramTokenizer:
+    def __init__(self, pathToFiles,stemmer=None,n=1):
+        self.pathToFiles = pathToFiles
+        self.stemmer = stemmer
+        self.n=n
+        self.ngrams = {}
+        if pathToStopWords:
+            with open('./{}'.format(pathToStopWords)) as stopWordsFile:
+                self.stopWords = [line.rstrip('\n') for line in stopWordsFile]
+        self.iterateThroughFiles()
+
+    def iterateThroughFiles(self):
+        for filename in os.listdir(self.pathToFiles):
+            with open('./{}/{}'.format(self.pathToFiles, filename)) as currentFile:
+                self.tokenizer(currentFile, filename)
+
+    def tokenizer(self, currentFile, filename):
+        self.ngrams[filename] = []
+        lastTokens = []
+        for line in currentFile:
+            tokens = WhitespaceTokenizer().tokenize(line)
+            for token in tokens:
+                token = token.split("_")
+                if token[1] not in self.wordsToKeep:
+                    lastTokens = []
+                    continue
+                token = token[0].lower()
+                if self.checkStopWord(token):
+                    lastTokens = []
+                    continue
+                if self.stemmer:
+                    token = self.stemmer.stem(token)
+                if not token:
+                    continue
                 if token not in self.vocabulary:
                     self.vocabulary[token] = 1
                     self.ngrams[filename].add_node(token)
