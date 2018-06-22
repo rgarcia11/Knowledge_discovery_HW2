@@ -43,3 +43,4 @@ It was solved in Python3.3.
 ## How to run
 
 ## Limitations
+Some phrases in the golden standard are beyond unigram, bigram and trigrams, as they could be comprised of longer sentences. For example, file 2466 has only one sentence, "content analysis and indexing", that doesn't match any possible output of the program, as it could only output trigrams, at most. Even if "analysis and indexing" or "content analysis" is an output, it would not be registered as a correct match.
