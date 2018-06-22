@@ -5,7 +5,6 @@ This exercise solution is presented by Rogelio Garcia.
 """
 import os
 import re
-from heapq import nlargest
 from nltk.tokenize import WhitespaceTokenizer
 from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
@@ -158,9 +157,6 @@ class nGramTokenizer:
         self.stemmer = stemmer
         self.n=n
         self.ngrams = {}
-        if pathToStopWords:
-            with open('./{}'.format(pathToStopWords)) as stopWordsFile:
-                self.stopWords = [line.rstrip('\n') for line in stopWordsFile]
         self.iterateThroughFiles()
 
     def iterateThroughFiles(self):
@@ -169,78 +165,61 @@ class nGramTokenizer:
                 self.tokenizer(currentFile, filename)
 
     def tokenizer(self, currentFile, filename):
-        self.ngrams[filename] = []
+        self.ngrams[filename] = {}
         lastTokens = []
         for line in currentFile:
             tokens = WhitespaceTokenizer().tokenize(line)
             for token in tokens:
                 token = token.split("_")
-                if token[1] not in self.wordsToKeep:
-                    lastTokens = []
-                    continue
                 token = token[0].lower()
-                if self.checkStopWord(token):
-                    lastTokens = []
-                    continue
                 if self.stemmer:
                     token = self.stemmer.stem(token)
                 if not token:
                     continue
-                if token not in self.vocabulary:
-                    self.vocabulary[token] = 1
-                    self.ngrams[filename].add_node(token)
-                else:
-                    self.vocabulary[token] += 1
-                if lastTokens:
-                    for lastToken in lastTokens:
-                        currentEdge = self.ngrams[filename].get_edge(lastToken, token)
-                        if currentEdge == -1:
-                            self.ngrams[filename].add_edge(lastToken, token, 1)
-                        else:
-                            self.ngrams[filename].add_edge(lastToken, token, currentEdge+1)
                 lastTokens.append(token)
                 if len(lastTokens) > self.n:
                     lastTokens = lastTokens[1:]
+                newNGram = ''
+                if len(lastTokens) == self.n:
+                    for currentToken in lastTokens:
+                        newNGram = '{} {}'.format(newNGram,currentToken)
+                    newNGram = newNGram.strip()
+                if newNGram:
+                    self.ngrams[filename][newNGram] = 0
 
-    def checkStopWord(self,word):
-        """
-        If there is a stop word catalogue, it checks if a given word is a stop word in the catalogue.
-        If not, it checks if a give word is a stop word in the NLTK catalogue.
-        It receives the word as parameters and outputs True or False.
-        """
-        if not self.stopWords:
-            return False
-        else:
-            if word in self.stopWords:
-                return True
-            else:
-                return False
+class lineTokenizer:
+    def __init__(self, pathToFiles,stemmer=None):
+        self.pathToFiles = pathToFiles
+        self.stemmer = stemmer
+        self.ngrams = {}
+        self.iterateThroughFiles()
 
-    def sparseVectors(self):
-        """
-        Returns the vector in the sparse TF-IDF notation.
-        Returns a dictionary of dictionaries.
-        """
-        words = list(self.vocabulary.keys())
-        sparseVectors = {}
-        currentWord = 0
-        for word in words:
-            currentWord += 1
-            files = self.vocabulary[word]
-            for file in files:
-                if file not in sparseVectors:
-                    sparseVectors[file] = {currentWord:self.vocabulary[word][file]}
-                else:
-                    sparseVectors[file][currentWord] = self.vocabulary[word][file]
-        return sparseVectors
+    def iterateThroughFiles(self):
+        for filename in os.listdir(self.pathToFiles):
+            with open('./{}/{}'.format(self.pathToFiles, filename)) as currentFile:
+                self.tokenizer(currentFile, filename)
 
-    def listOfWords(self):
-        """
-        Returns a list of the words in the vocabulary.
-        The index for each word matches the index used in the sparse vector.
-        """
-        return list(self.vocabulary.keys())
-
+    def tokenizer(self, currentFile, filename):
+        lines = [line.rstrip('\n') for line in currentFile]
+        self.ngrams[filename] = {}
+        lastTokens = []
+        for line in lines:
+            tokens = WhitespaceTokenizer().tokenize(line)
+            lastTokens = []
+            for token in tokens:
+                token = token.split("_")
+                token = token[0].lower()
+                if self.stemmer:
+                    token = self.stemmer.stem(token)
+                if not token:
+                    continue
+                lastTokens.append(token)
+            newNGram = ''
+            for currentToken in lastTokens:
+                newNGram = '{} {}'.format(newNGram,currentToken)
+            newNGram = newNGram.strip()
+            if newNGram:
+                self.ngrams[filename][newNGram] = 0
 
 if __name__ == '__main__':
     folderTokenizer = FolderTokenizer('./wwwSmall/abstracts',pathToStopWords='./stopwords.txt',wordsToKeep=['NN','NNS','NNP','NNPS','JJ'],stemmer=PorterStemmer())
