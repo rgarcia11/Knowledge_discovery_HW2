@@ -36,7 +36,7 @@ It was solved in Python3.3.
 **where rd is the rank at which the first correct prediction was found for d ∈ D.
 
 ### 5. (Bonus credit)
-**<span style="color:blue">[Extra-credit - 50 points]</span> Compare the MRR of the above PageRank algorithm with the MRR of a ranking of words based on their TF-IDF ranking scheme. Calculate the TF component from each document and the IDF component from the entire collection.**
+**<span style="color:blue">*[Extra-credit - 50 points]*</span> Compare the MRR of the above PageRank algorithm with the MRR of a ranking of words based on their TF-IDF ranking scheme. Calculate the TF component from each document and the IDF component from the entire collection.**
 
 ## Solution
 
