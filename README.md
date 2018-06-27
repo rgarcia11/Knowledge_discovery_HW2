@@ -262,6 +262,31 @@ MRR for TF-IDF when looking at the top 8 words: 0.16942087361260286
 MRR for TF-IDF when looking at the top 9 words: 0.17075754863348844
 MRR for TF-IDF when looking at the top 10 words: 0.17165980427258612
 ```
+The comparison between the two was made using a Jupyter Notebook that only reads the two files that were written and creates a diagram. It uses the Jupyter built in *%pylab inline* dependency.
+
+*In [1]:*
+<pre>
+%pylab inline
+</pre>
+*Out [1]:*
+<pre>
+Populating the interactive namespace from numpy and matplotlib
+</pre>
+*In [2]:*
+<pre>
+MRR_Scores = loadtxt('MRR.txt')
+MRR_TF_IDF_Scores = loadtxt('MRR_tf_idf.txt')
+k = linspace(1,10,10)
+plot(k,MRR_Scores,'-o',label='Page Rank')
+plot(k,MRR_TF_IDF_Scores,'-o',label='TF-IDF')
+xlabel('k')
+ylabel('MRR')
+legend(loc='best')
+savefig('Comparison.jpg')
+</pre>
+*Out [2]*
+
+![Comparison](https://i.imgur.com/dTAYccA.jpg)
 
 ## Code
 The code is fully available in Sicua and the Virtual Machine.
@@ -279,6 +304,12 @@ or
 And in the Virtual Machine, the script will be found in */home/estudiante/Documents/Knowledge_discovery_HW1*, And it can be reached with the following command: 
 
 > cd /home/estudiante/Documents/Knowledge_discovery_HW1
+
+For the Jupyter Notebook, it can be run with the following command:
+
+> jupyter notebook
+
+And in the web interface, look for Comparison.ipynb and run the two cells with shift-enter. This cannot be done in the Virtual Machine. However, the purpose of the notebook is only to visualize the diagram and compare the two methods, and the diagram can be found in Comparison.jpg anyways.
 
 ## Limitations
 Some phrases in the golden standard are beyond unigram, bigram and trigrams, as they could be comprised of longer sentences. For example, file 2466 has only one sentence, "content analysis and indexing", that doesn't match any possible output of the program, as it could only output trigrams, at most. Even if "analysis and indexing" or "content analysis" is an output, it would not be registered as a correct match.
