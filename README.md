@@ -33,7 +33,7 @@ It was solved in Python3.3.
 
 > MRR = 1/|D| * sum(d=1,|D|,1/rd)
 
-**where rd is the rank at which the first correct prediction was found for d ∈ D.
+*where rd is the rank at which the first correct prediction was found for d ∈ D.*
 
 ### 5. (Bonus credit)
 ***[Extra-credit - 50 points]* Compare the MRR of the above PageRank algorithm with the MRR of a ranking of words based on their TF-IDF ranking scheme. Calculate the TF component from each document and the IDF component from the entire collection.**
