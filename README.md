@@ -301,9 +301,9 @@ or
 
 > python hw2.py
 
-And in the Virtual Machine, the script will be found in */home/estudiante/Documents/Knowledge_discovery_HW1*, And it can be reached with the following command: 
+And in the Virtual Machine, the script will be found in */home/estudiante/Documents/Knowledge_discovery_HW2*, And it can be reached with the following command: 
 
-> cd /home/estudiante/Documents/Knowledge_discovery_HW1
+> cd /home/estudiante/Documents/Knowledge_discovery_HW2
 
 For the Jupyter Notebook, it can be run with the following command:
 
