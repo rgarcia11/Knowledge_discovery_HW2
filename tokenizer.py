@@ -80,6 +80,7 @@ class FolderTokenizer:
         separates tokens on spaces.
         """
         self.ngrams[filename] = graph_constructor.Undirected_graph()
+        self.wordCount[filename] = {}
         lastTokens = []
         for line in currentFile:
             tokens = WhitespaceTokenizer().tokenize(line)
@@ -96,11 +97,15 @@ class FolderTokenizer:
                     token = self.stemmer.stem(token)
                 if not token:
                     continue
-                if token not in self.vocabulary:
-                    self.vocabulary[token] = 1
+                if token not in self.wordCount[filename]:
+                    if token not in self.vocabulary:
+                        self.vocabulary[token] = 1
+                    else:
+                        self.vocabulary[token] += 1
                     self.ngrams[filename].add_node(token)
+                    self.wordCount[filename][token] = 1
                 else:
-                    self.vocabulary[token] += 1
+                    self.wordCount[filename][token] += 1
                 if lastTokens:
                     for lastToken in lastTokens:
                         currentEdge = self.ngrams[filename].get_edge(lastToken, token)
@@ -152,7 +157,15 @@ class FolderTokenizer:
         return list(self.vocabulary.keys())
 
 class nGramTokenizer:
+    """
+    Tokenizes without a filter of words and an optional stemmer. Forms ngrams.
+    """
     def __init__(self, pathToFiles,stemmer=None,n=1):
+        """
+        pathToFiles files to tokenize
+        stemmer the stemmer to be used, if any
+        n in n-gram
+        """
         self.pathToFiles = pathToFiles
         self.stemmer = stemmer
         self.n=n
@@ -160,11 +173,17 @@ class nGramTokenizer:
         self.iterateThroughFiles()
 
     def iterateThroughFiles(self):
+        """
+        Iteratures through every file and calls the tokenizing function
+        """
         for filename in os.listdir(self.pathToFiles):
             with open('./{}/{}'.format(self.pathToFiles, filename)) as currentFile:
                 self.tokenizer(currentFile, filename)
 
     def tokenizer(self, currentFile, filename):
+        """
+        Tokenizes with the n for the ngram and uses the stemmer.
+        """
         self.ngrams[filename] = {}
         lastTokens = []
         for line in currentFile:
@@ -188,6 +207,9 @@ class nGramTokenizer:
                     self.ngrams[filename][newNGram] = 0
 
 class lineTokenizer:
+    """
+    Tokenizes line by line. Each line is a token in its own.
+    """
     def __init__(self, pathToFiles,stemmer=None):
         self.pathToFiles = pathToFiles
         self.stemmer = stemmer
@@ -195,11 +217,17 @@ class lineTokenizer:
         self.iterateThroughFiles()
 
     def iterateThroughFiles(self):
+        """
+        Iteratures through every file and calls the tokenizing function
+        """
         for filename in os.listdir(self.pathToFiles):
             with open('./{}/{}'.format(self.pathToFiles, filename)) as currentFile:
                 self.tokenizer(currentFile, filename)
 
     def tokenizer(self, currentFile, filename):
+        """
+        Tokenizes line by line using a stemmer and no word filter.
+        """
         lines = [line.rstrip('\n') for line in currentFile]
         self.ngrams[filename] = {}
         lastTokens = []
@@ -220,6 +248,3 @@ class lineTokenizer:
             newNGram = newNGram.strip()
             if newNGram:
                 self.ngrams[filename][newNGram] = 0
-
-if __name__ == '__main__':
-    folderTokenizer = FolderTokenizer('./wwwSmall/abstracts',pathToStopWords='./stopwords.txt',wordsToKeep=['NN','NNS','NNP','NNPS','JJ'],stemmer=PorterStemmer())

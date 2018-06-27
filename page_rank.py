@@ -6,7 +6,7 @@ sys.setrecursionlimit(1500)
 
 def s(vi, graph, alpha, p, convergence, last_page_rank, n=None):
     """
-    Recursively computes the equation
+    Computes the equation
     s(vi) = alpha * sum(vj in adjacent nodes of vi, wji/(sum(vk in adjacent nodes of vj)*wjk)*s(vj)+(1-alpha)*pi)
     s is the rank (result of this function)
     alpha is a damping factor
@@ -19,6 +19,14 @@ def s(vi, graph, alpha, p, convergence, last_page_rank, n=None):
     return alpha*sum(graph.get_edge(vj,vi)/sum(graph.get_edge(vj,vk) for vk in graph.graph[vj])*last_page_rank[vj] for vj in graph.graph[vi])+(1-alpha)*p[vi]
 
 def page_rank(graph,alpha,convergence,p=None):
+    """
+    Computes the page rank equation for each node in the graph a number of times given by parameter.
+    Parameters
+        graph
+        alpha: the damping factor
+        convergence: the number of times the algorithm is run for each node
+        p (optional): vector of node weights
+    """
     p = {}
     page_rank = {}
     last_page_rank = {}

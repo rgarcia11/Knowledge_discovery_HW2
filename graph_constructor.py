@@ -25,9 +25,9 @@ class Undirected_graph:
         If the edge already exists, it is replaced.
         """
         if first_node not in self.graph:
-            add_node(first_node)
+            self.add_node(first_node)
         if second_node not in self.graph:
-            add_node(second_node)
+            self.add_node(second_node)
         self.graph[first_node][second_node] = weight
         self.graph[second_node][first_node] = weight
 
